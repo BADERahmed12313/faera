@@ -13,22 +13,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter (manual)
-        run: |
-          git clone https://github.com/flutter/flutter.git -b stable --depth 1
-          echo "$PWD/flutter/bin" >> $GITHUB_PATH
-          flutter --version
+      # ✅ Flutter (ثابت وبدون مشاكل ARM أو PATH)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Verify Flutter
+        run: flutter --version
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Install pods
+      - name: Install iOS Pods
         run: |
           cd ios
           pod install
           cd ..
 
-      - name: Build IPA
+      - name: Build IPA (no signing)
         run: flutter build ipa --release --no-codesign
 
       - name: Upload IPA
